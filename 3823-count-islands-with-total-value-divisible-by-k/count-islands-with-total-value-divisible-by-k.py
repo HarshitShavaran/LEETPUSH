@@ -1,20 +1,30 @@
 class Solution:
     def countIslands(self, grid: List[List[int]], k: int) -> int:
-        m, n = len(grid), len(grid[0])
-        ans = 0
-        def dfs(i: int, j: int) -> int:
-            if i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == 0:
-                return 0
-            s = grid[i][j]
-            grid[i][j] = 0
-            s += dfs(i + 1, j)
-            s += dfs(i - 1, j)
-            s += dfs(i, j + 1)
-            s += dfs(i, j - 1)
-            return s
+        m = len(grid)
+        n = len(grid[0])
+        res = 0
+        visited = [[False] * n for _ in range(m)]
+
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
         for i in range(m):
             for j in range(n):
-                if grid[i][j] > 0:
-                    if dfs(i, j) % k == 0:
-                        ans += 1
-        return ans
+                if grid[i][j] > 0 and not visited[i][j]:
+                    q = deque([(i, j)])
+                    visited[i][j] = True
+                    curSum = 0
+
+                    while q:
+                        r, c = q.popleft()
+                        curSum += grid[r][c]
+
+                        for dr, dc in directions:
+                            nr, nc = r + dr, c + dc
+                            if 0 <= nr < m and 0 <= nc < n and grid[nr][nc] > 0 and not visited[nr][nc]:
+                                visited[nr][nc] = True
+                                q.append((nr, nc))
+                    
+                    if curSum % k == 0:
+                        res += 1
+        return res
+
